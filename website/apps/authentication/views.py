@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,8 +16,6 @@ class RegistrationAPIView(APIView):
     serializer_class = RegistrationSerializer
 
     def post(self, request):
-        print(request.data)
-        print("----------")
         user = request.data.get('user', {})
         serializer = self.serializer_class(data = user)
         serializer.is_valid(raise_exception = True)
@@ -38,7 +36,7 @@ class LoginAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserRetrieveUpdateAPIView(APIView):
+class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permissions = (IsAuthenticated)
     render_classes = (UserJsonRenderer)
     serializer_class = UserSerializer

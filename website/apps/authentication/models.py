@@ -27,11 +27,11 @@ class User(AbstractUser, TimestampedModel):
     def token(self):
         return self._generate_jwt_token()
 
-    def _generate_jwt_token():
+    def _generate_jwt_token(self):
         dt = datetime.now() + timedelta(days=1)
         token = jwt.encode({
             'id': self.pk,
-            'exp': int(dt.strftime('%s'))
+            'exp': int(dt.timestamp())
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token.decode('utf-8')

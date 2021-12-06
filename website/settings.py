@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # User defined application
-    'website.apps.authentication'
+    'website.apps.authentication',
+    'website.apps.profiles'
 ]
 
 MIDDLEWARE = [
@@ -146,4 +147,5 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 20,
     'NON_FIELD_ERRORS_KEY': 'error',
+    'UPLOADED_FILES_USE_URL': True,
 }
