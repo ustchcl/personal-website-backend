@@ -15,11 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+from django.contrib.staticfiles import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     url(r'^api/', include(('website.apps.authentication.urls', 'authentication'), namespace='authentication')),
     url(r'^api/', include(('website.apps.profiles.urls', 'profiles'), namespace='profiles')),
+
+    re_path(r'^static/(?P<path>.*)$', views.serve),
 ]
