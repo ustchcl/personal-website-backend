@@ -11,13 +11,15 @@ from .renderers import ProfileJSONRenderer
 from .serializers import ProfileSerializer
 
 class ProfileRetrieveAPIView(RetrieveAPIView):
-    permissions = (AllowAny)
+    permissions = (AllowAny, )
     queryset = Profile.objects.select_related('user')
-    renderer_classes = (ProfileJSONRenderer)
+    renderer_classes = (ProfileJSONRenderer,)
     serializer_class = ProfileSerializer
 
-    def retrieve(self, request, username, *args, **kwargs):
+    def retrieve(self, request, username):
+        print("username: ", username)
         try:
+            print(self.serializer_class(self.get_queryset(), many=True).data)
             profile = self.queryset.get(user__username=username)
         except Profile.DoesNotExist:
             raise NotFound('Profile does not exist')

@@ -9,8 +9,7 @@ class Profile(TimestampedModel):
     )
 
     bio = models.TextField(blank=True)
-
-    image = models.FileField(max_length=255, upload_to='uploads/%Y/%m/%d/')
+    image = models.FileField(max_length=255, upload_to='uploads/%Y/%m/%d/', blank=True)
 
 
     def __str__(self):

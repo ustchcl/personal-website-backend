@@ -7,5 +7,9 @@ class AuthenticationAppConfig(AppConfig):
     label = 'authentication'
     verbose_name = 'Authentication'
 
+    def ready(self):
+        import website.apps.authentication.signals
+
+
 
 default_app_config = 'website.apps.authentication.AuthenticationAppConfig'
