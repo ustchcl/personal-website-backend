@@ -44,7 +44,8 @@ INSTALLED_APPS = [
 
     # User defined application
     'website.apps.authentication',
-    'website.apps.profiles'
+    'website.apps.profiles',
+    'website.apps.articles'
 ]
 
 MIDDLEWARE = [

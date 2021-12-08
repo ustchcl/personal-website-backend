@@ -23,6 +23,7 @@ urlpatterns = [
 
     url(r'^api/', include(('website.apps.authentication.urls', 'authentication'), namespace='authentication')),
     url(r'^api/', include(('website.apps.profiles.urls', 'profiles'), namespace='profiles')),
-
+    url(r'^api/', include(('website.apps.articles.urls', 'articles'), namespace='articles')),
+    
     re_path(r'^static/(?P<path>.*)$', views.serve),
 ]
