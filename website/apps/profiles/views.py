@@ -28,7 +28,6 @@ class ProfileRetrieveUpdateAPIView(RetrieveUpdateAPIView):
             'bio': bio,
             'image': image
         }
-        print (serializer_data)
         serializer = self.serializer_class(profile, data=serializer_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()

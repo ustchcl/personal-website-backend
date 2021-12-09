@@ -8,7 +8,7 @@ from .relations import TagRelationField
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(required=True)
+    slug = serializers.SlugField(required=False)
     title = serializers.CharField(required=True, max_length=255)
     description = serializers.CharField(required=False)
 
@@ -41,6 +41,8 @@ class ArticleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags = validated_data.pop('tag', [])
         article = Article.objects.create(**validated_data)
+        
+        print('tags: ', tags)
         
         for tag in tags:
             article.tags.add(tag)
