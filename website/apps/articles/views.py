@@ -43,12 +43,14 @@ class ArticleViewSet(mixins.CreateModelMixin,
         return queryset
 
     def create(self, request):
+        tag_str = request.data.pop("tagList", '')
+        request.data['tagList'] = tag_str[0].split(',')
         serializer_data = {
             'cover': request.data.get('cover', None),
             'title': request.data.get('title', None),
             'markdown_path': request.data.get('markdown_path', None),
             'description': request.data.get('description', None),
-            #'tags': request.data.get('tags', '').split(',')
+            'tagList': request.data.get('tagList', [])
         }
         # print('tags', request.data.get('tagList', ''))
         serializer = self.serializer_class(data=serializer_data)
@@ -139,7 +141,7 @@ class TagListAPIView(ListAPIView):
     
     def list(self, request):
         tags = self.get_queryset()
-        serializer = self.serializer_class(data=tags, many=True)
+        serializer = self.serializer_class(tags, many=True)
         return Response({
             'tags': serializer.data
         }, status=status.HTTP_200_OK)

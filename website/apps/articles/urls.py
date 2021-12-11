@@ -9,8 +9,8 @@ router.register(r'articles', ArticleViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path('', include(router.urls)),
     url(r'^tags/?$', TagListAPIView.as_view()),
     url(r'^articles/(?P<article_slug>[-\w]+)/comments/?$', CommentListCreateAPIView.as_view()),
-    url(r'^articles/(?P<article_slug>[-\w]+)/comments/(?P<comment_pk>[\d]+)/?$', CommentDestroyAPIView.as_view())
+    url(r'^articles/(?P<article_slug>[-\w]+)/comments/(?P<comment_pk>[\d]+)/?$', CommentDestroyAPIView.as_view()),
+    path('', include(router.urls)),
 ]

@@ -39,7 +39,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        tags = validated_data.pop('tag', [])
+        tags = validated_data.pop('tags', [])
         article = Article.objects.create(**validated_data)
         
         print('tags: ', tags)
