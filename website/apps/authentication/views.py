@@ -31,12 +31,14 @@ class RegistrationAPIView(ListCreateAPIView):
 
 class LoginAPIView(APIView):
     permissions = (AllowAny,)
-    render_classes = (UserJsonRenderer)
+    render_classes = (UserJsonRenderer,)
     serializer_class = LoginSerializer
 
     def post(self, request):
         user = request.data.get('user', {})
-        serializer = self.serializer_class(data = user)
+        serializer = self.serializer_class(data=user)
+        print(serializer.initial_data)
+        print(serializer.is_valid())
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)

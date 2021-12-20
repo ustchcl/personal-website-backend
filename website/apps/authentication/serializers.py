@@ -37,11 +37,16 @@ class LoginSerializer(serializers.Serializer):
 
         if password is None:
             raise serializers.ValidationError('A password is required to log in')
+        
+        print(email, password)
 
         user = authenticate(username=email, password=password)
 
         if user is None:
-            raise serializers.ValidationError('A user with this email and password was not found')
+            try:
+                user = User.objects.get(email=email, password=password)
+            except User.DoesNotExist:
+                raise serializers.ValidationError('A user with this email and password was not found')
 
         if not user.is_active:
             raise serializers.ValidationError('This user has been deactivated')

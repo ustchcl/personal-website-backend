@@ -11,6 +11,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
     authentication_header_prefix = 'Token'
 
     def authenticate(self, request):
+        print ("OK -------- ")
         """
         The `authenticate` method is called on every request, regardless of
         whether the endpoint requires authentication. 
@@ -38,7 +39,10 @@ class JWTAuthentication(authentication.BaseAuthentication):
         auth_header = authentication.get_authorization_header(request).split()
         auth_header_prefix = self.authentication_header_prefix.lower()
 
+        print(auth_header, auth_header_prefix)
+
         if not auth_header:
+            print("yes, no auth header")
             return None
 
         if len(auth_header) == 1:
@@ -58,6 +62,10 @@ class JWTAuthentication(authentication.BaseAuthentication):
         # if we didn't decode these values.
         prefix = auth_header[0].decode('utf-8')
         token = auth_header[1].decode('utf-8')
+
+        print("------------")
+
+        print(prefix, auth_header_prefix)
 
         if prefix.lower() != auth_header_prefix:
             # The auth header prefix is not what we expected. Do not attempt to

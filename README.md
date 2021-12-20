@@ -1,12 +1,24 @@
 # web-site backend
 
 
+#### create
 ```
 {
     "user": {
-        "email": "hong7@qq.com",
+        "email": "779016407@qq.com",
         "password": "12345678",
-        "username": "Hong7"
+        "username": "hong-test"
     }
 }
 ``
+
+#### login
+
+```
+{
+  "user": {
+    "email": "779016407@qq.com",
+    "password": "12345678"
+  }
+}
+```
