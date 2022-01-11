@@ -22,6 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-6y)a0^+o6z3r$w9u7p&q@n$!k(8n(n4m@9-wpy(kw_o_d-(cs^'
 
+ALGORITHM = 'HS256'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -49,6 +51,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,14 +149,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # )
 
 
-# CORS_ORIGIN_ORIGINS = [
-#     "*",
-#     'http://0.0.0.0:4000',
-#     'http://localhost:4000',
-#     'http://localhost:3000'
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    'http://localhost:4000',
+]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'authentication.User'
 
@@ -166,3 +167,16 @@ REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
     'UPLOADED_FILES_USE_URL': True,
 }
+
+from django.contrib.staticfiles import handlers
+
+# extend StaticFilesHandler to add "Access-Control-Allow-Origin" to every response
+class CORSStaticFilesHandler(handlers.StaticFilesHandler):
+    def serve(self, request):
+        response = super().serve(request)
+        response['Access-Control-Allow-Origin'] = '*'
+        response['Access-Control-Allow-Headers'] = '*'
+        return response
+
+# monkeypatch handlers to use our class instead of the original StaticFilesHandler
+handlers.StaticFilesHandler = CORSStaticFilesHandler

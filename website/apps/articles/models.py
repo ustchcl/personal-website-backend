@@ -9,6 +9,7 @@ class Article(TimestampedModel):
     tags = models.ManyToManyField('articles.Tag', related_name='articles')
     cover = models.FileField(max_length=255, upload_to='static/uploads/%Y/%m/%d/', blank=True)
     markdown_path = models.TextField()
+    recommended = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

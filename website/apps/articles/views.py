@@ -1,5 +1,6 @@
 from django.db.models.query import QuerySet
 from rest_framework import serializers, viewsets, mixins, status
+from rest_framework import decorators
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes, renderer_classes
@@ -25,13 +26,15 @@ class ArticleListCreateAPIView(ListCreateAPIView):
 
 
 class ArticleViewSet(mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
                         mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
+                        mixins.DestroyModelMixin,
                         GenericViewSet):
 
     lookup_field = "slug"
     queryset = Article.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     renderer_classes = (ArticleJSONRenderer, )
     serializer_class = ArticleSerializer
 
@@ -43,20 +46,18 @@ class ArticleViewSet(mixins.CreateModelMixin,
         return queryset
 
     def create(self, request):
-        tag_str = request.data.pop("tagList", '')
-        request.data['tagList'] = tag_str[0].split(',')
+        tags = request.data.get("tagList", '').split(',')
+        print('tags', tags)
         serializer_data = {
             'cover': request.data.get('cover', None),
             'title': request.data.get('title', None),
             'markdown_path': request.data.get('markdown_path', None),
             'description': request.data.get('description', None),
-            'tagList': request.data.get('tagList', [])
+            'recommended': request.data.get('recommended', False),
+            'tagList': [ tag for tag in tags if len(tag) > 0 ]
         }
-        # print('tags', request.data.get('tagList', ''))
         serializer = self.serializer_class(data=serializer_data)
-        
         serializer.is_valid(raise_exception=True)
-        # print(serializer.data)
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -68,26 +69,66 @@ class ArticleViewSet(mixins.CreateModelMixin,
 
     def retrieve(self, request, slug):
         try:
-            serializer_instance = self.query_set.get(slug=slug)
+            serializer_instance = self.get_queryset().get(slug=slug)
         except Article.DoesNotExist:
             raise NotFound("An article with this slug does not exist.")
 
         serializer = self.serializer_class(serializer_instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, slug):
+        try:
+            serializer_instance = self.get_queryset().get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound("An article with this slug does not exist.")
+        serializer_instance.delete()
+        return Response({"message": "ok"}, status=status.HTTP_204_NO_CONTENT)
      
     def update(self, request, slug):
         try:
-            serializer_instance = self.query_set.get(slug=slug)
+            serializer_instance = self.get_queryset().get(slug=slug)
         except Article.DoesNotExist:
             raise NotFound("An article with this slug does not exist.")
         
-        serializer_data = request.data.get('article', {})
+        tags = request.data.get("tagList", '').split(',')
+        serializer_data = {
+            'tagList': [ tag for tag in tags if len(tag) > 0 ]
+        }
+
+        cover = request.data.get('cover', None)
+        if cover is not None:
+            serializer_data['cover'] = cover
+
+        title = request.data.get('title', None)
+        if title is not None:
+            serializer_data['title'] = title
+
+        markdown_path = request.data.get('markdown_path', None)
+        if markdown_path is not None:
+            serializer_data['markdown_path'] = markdown_path
+
+        description = request.data.get('description', None)
+        if description is not None:
+            serializer_data['description'] = description
+
+        recommended = request.data.get('recommended', None)
+        if recommended is not None:
+            serializer_data['recommended'] = recommended
         
         serializer = self.serializer_class(serializer_instance, data=serializer_data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         return Response(serializer.data, status.HTTP_200_OK)
-        
+
+
+
+class RecommendedArticleAPIView(ListAPIView):
+    queryset = Article.objects.all().filter(recommended=True)
+    serializer_class = ArticleSerializer
+    permission_classes = (AllowAny,)
+
+
 class CommentListCreateAPIView(ListCreateAPIView):
     lookup_field = "article__slug"
     lookup_url_kwarg = "article__slug"

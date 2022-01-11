@@ -1,4 +1,6 @@
+from typing_extensions import Required
 from rest_framework import serializers
+from website.apps import articles
 
 from website.apps.profiles.serializers import ProfileSerializer
 
@@ -13,8 +15,9 @@ class ArticleSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
 
     tagList = TagRelationField(many=True, required=False, source='tags')
-    cover = serializers.FileField(max_length=255)
+    cover = serializers.FileField(max_length=255, required=False)
     markdown_path = serializers.CharField(required=True)
+    recommended = serializers.BooleanField(required=False)
 
     # Django REST Framework makes it possible to create a read-only field that
     # gets it's value by calling a function. In this case, the client expects
@@ -34,16 +37,35 @@ class ArticleSerializer(serializers.ModelSerializer):
             'tagList',
             'cover',
             'markdown_path',
+            'recommended',
             'createdAt',
             'updatedAt',
         )
 
+    # def validate(self, data):
+    #     return data
+        
+    
+    def update(self, instance, validated_data):
+        instance.cover = validated_data.get('cover', instance.cover)
+        instance.title = validated_data.get('title', instance.title)
+        instance.markdown_path = validated_data.get('markdown_path', instance.markdown_path)
+        instance.description = validated_data.get('description', instance.description)
+        instance.recommended = validated_data.get('recommended', instance.recommended)
+
+        tags = validated_data.pop('tags', [])
+        for tag in tags:
+            instance.tags.add(tag)
+
+        instance.save()
+        
+        return instance
+
+
+
     def create(self, validated_data):
         tags = validated_data.pop('tags', [])
         article = Article.objects.create(**validated_data)
-        
-        print('tags: ', tags)
-        
         for tag in tags:
             article.tags.add(tag)
         

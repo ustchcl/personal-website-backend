@@ -125,6 +125,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
         token = jwt.encode({
             'id': self.pk,
             'exp': int(dt.timestamp())
-        }, settings.SECRET_KEY, algorithm='HS256')
+        }, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
         return token #.decode('utf-8')
